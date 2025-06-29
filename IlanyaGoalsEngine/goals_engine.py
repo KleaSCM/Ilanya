@@ -1,4 +1,3 @@
-
 # Ilanya Goals Engine - Main Engine
 
 # Main orchestrator for the Goals Engine that manages goal formation, monitoring,
@@ -282,7 +281,7 @@ class GoalsEngine:
         # Combined stability measure
         stability = 1.0 / (1.0 + strength_variance + progress_variance + (1.0 - interaction_stability))
         
-        return max(0.0, min(1.0, stability))
+        return max(0.0, min(1.0, float(stability)))
     
     def _apply_stability_corrections(self):
         """Apply corrections when system stability is low."""

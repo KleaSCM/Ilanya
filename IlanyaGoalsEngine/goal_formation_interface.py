@@ -1,4 +1,3 @@
-
 # Ilanya Goals Engine - Goal Formation Interface
 
 # Handles the field-like attraction dynamics for converting desires into goals.
@@ -12,7 +11,7 @@
 
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Any
 import math
 import logging
 
@@ -302,7 +301,7 @@ class GoalFormationInterface:
             buff_strength = self.config.desire_buff_multiplier
             goal.apply_desire_buff(desire_id, buff_strength)
     
-    def get_formation_statistics(self) -> Dict[str, any]:
+    def get_formation_statistics(self) -> Dict[str, Any]:
         """Get statistics about goal formation process."""
         total_desires = len(self.desire_strength_history)
         forming_goals = len(self.forming_goals)

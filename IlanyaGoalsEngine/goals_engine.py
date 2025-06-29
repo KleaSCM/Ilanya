@@ -1,15 +1,14 @@
-"""
-Ilanya Goals Engine - Main Engine
 
-Main orchestrator for the Goals Engine that manages goal formation, monitoring,
-resolution, and mathematical stability controls. Implements Nash equilibrium,
-multi-objective optimization, and Lyapunov stability analysis.
+# Ilanya Goals Engine - Main Engine
 
-Author: KleaSCM
-Email: KleaSCM@gmail.com
-License: MIT
-Version: 0.1.0
-"""
+# Main orchestrator for the Goals Engine that manages goal formation, monitoring,
+# resolution, and mathematical stability controls. Implements Nash equilibrium,
+# multi-objective optimization, and Lyapunov stability analysis.
+
+# Author: KleaSCM
+# Email: KleaSCM@gmail.com
+# License: MIT
+# Version: 0.1.0
 
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple, Any

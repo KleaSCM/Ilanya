@@ -1,4 +1,4 @@
-"""
+
 # Ilanya Goals Engine Demo
 
 # Demonstrates the Goals Engine functionality including goal formation,
@@ -8,7 +8,7 @@
 # Email: KleaSCM@gmail.com
 # License: MIT
 # Version: 0.1.0
-"""
+
 
 import sys
 import os

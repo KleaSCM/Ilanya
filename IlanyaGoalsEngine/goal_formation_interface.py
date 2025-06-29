@@ -1,15 +1,15 @@
-"""
-Ilanya Goals Engine - Goal Formation Interface
 
-Handles the field-like attraction dynamics for converting desires into goals.
-Implements mathematical thresholds and temporal stability requirements for
-goal formation based on desire strength and persistence.
+# Ilanya Goals Engine - Goal Formation Interface
 
-Author: KleaSCM
-Email: KleaSCM@gmail.com
-License: MIT
-Version: 0.1.0
-"""
+# Handles the field-like attraction dynamics for converting desires into goals.
+# Implements mathematical thresholds and temporal stability requirements for
+# goal formation based on desire strength and persistence.
+
+# Author: KleaSCM
+# Email: KleaSCM@gmail.com
+# License: MIT
+# Version: 0.1.0
+
 
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple

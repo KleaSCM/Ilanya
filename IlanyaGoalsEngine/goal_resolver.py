@@ -1,14 +1,14 @@
-"""
-Ilanya Goals Engine - Goal Resolver
 
-Determines when goals are complete, failed, or should be paused.
-Implements resolution criteria based on progress, confidence, and time.
+# Ilanya Goals Engine - Goal Resolver
 
-Author: KleaSCM
-Email: KleaSCM@gmail.com
-License: MIT
-Version: 0.1.0
-"""
+# Determines when goals are complete, failed, or should be paused.
+# Implements resolution criteria based on progress, confidence, and time.
+
+# Author: KleaSCM
+# Email: KleaSCM@gmail.com
+# License: MIT
+# Version: 0.1.0
+
 
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any

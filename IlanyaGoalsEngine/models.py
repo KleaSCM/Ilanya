@@ -1,14 +1,14 @@
-"""
-Ilanya Goals Engine - Models
 
-Data models for goals, goal states, and goal types.
-Implements the mathematical representation of goals and their properties.
+# Ilanya Goals Engine - Models
 
-Author: KleaSCM
-Email: KleaSCM@gmail.com
-License: MIT
-Version: 0.1.0
-"""
+# Data models for goals, goal states, and goal types.
+# Implements the mathematical representation of goals and their properties.
+
+# Author: KleaSCM
+# Email: KleaSCM@gmail.com
+# License: MIT
+# Version: 0.1.0
+
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta

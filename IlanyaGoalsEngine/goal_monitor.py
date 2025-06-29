@@ -1,14 +1,14 @@
-"""
-Ilanya Goals Engine - Goal Monitor
 
-Monitors goal progress and updates goal states based on various criteria.
-Implements progress tracking, confidence assessment, and goal state management.
+# Ilanya Goals Engine - Goal Monitor
 
-Author: KleaSCM
-Email: KleaSCM@gmail.com
-License: MIT
-Version: 0.1.0
-"""
+# Monitors goal progress and updates goal states based on various criteria.
+# Implements progress tracking, confidence assessment, and goal state management.
+
+# Author: KleaSCM
+# Email: KleaSCM@gmail.com
+# License: MIT
+# Version: 0.1.0
+
 
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any

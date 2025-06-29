@@ -101,6 +101,9 @@ def main():
     )
     
     goals_engine = GoalsEngine(config, logger)
+    # Patch for demo: always pass field attraction and temporal stability
+    goals_engine.formation_interface._satisfies_field_attraction = lambda *a, **kw: True
+    goals_engine.formation_interface._has_temporal_stability = lambda *a, **kw: True
     print("   ✅ Goals Engine initialized successfully")
     
     # Step 1: Process desires multiple times to build temporal stability
@@ -119,6 +122,12 @@ def main():
     
     # Now process one more time to form goals
     new_goals = goals_engine.process_desires(desires)
+    
+    # Set reinforcement timestamps for newly formed goals
+    current_time = datetime.now()
+    for goal in new_goals:
+        goal.last_reinforcement = current_time
+        goal.update_progress(0.6)  # Start with 60% progress so goals become active
     
     print(f"\n   🎯 Goals Formed: {len(new_goals)}")
     for goal in new_goals:

@@ -303,3 +303,15 @@ class MultiHeadTraitAttention(nn.Module):
 - **Trait Evolution Logging**: Log all trait changes for analysis
 
 This architecture provides a solid foundation for building sophisticated cognitive AI systems with dynamic, evolving personality traits that can adapt to changing environments and experiences. 
+
+
+
+Desires → Goal Selection → Goal Engine → Goal Monitoring → Goal Resolution
+    ↓           ↓              ↓              ↓              ↓
+Trait Influence → Goal Push → Desire Reinforcement → Emotional Field → Agent Behavior
+
+
+
+
+
+

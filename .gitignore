@@ -72,9 +72,6 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# 📊 Jupyter
-.ipynb_checkpoints
-*.ipynb
 
 # 🗄️ Database
 *.db

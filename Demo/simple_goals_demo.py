@@ -30,6 +30,7 @@ from utils.logging_utils import setup_logger
 def create_sample_goals():
     """Create sample goals directly for testing the Goals Engine."""
     goals = {}
+    current_time = datetime.now()
     
     # Learning goal
     learning_goal = Goal(
@@ -39,7 +40,7 @@ def create_sample_goals():
         source_desires=["desire_001"],
         source_traits=["openness", "learning_rate"],
         formation_strength=1.0,
-        formation_time=datetime.now(),
+        formation_time=current_time,
         state=GoalState.ACTIVE,
         current_strength=0.9,
         progress=0.3,
@@ -48,6 +49,7 @@ def create_sample_goals():
     learning_goal.apply_trait_buff("openness", 1.5)
     learning_goal.apply_trait_buff("learning_rate", 1.5)
     learning_goal.apply_desire_buff("desire_001", 1.3)
+    learning_goal.last_reinforcement = current_time  # Set reinforcement time
     goals[learning_goal.id] = learning_goal
     
     # Social goal
@@ -58,7 +60,7 @@ def create_sample_goals():
         source_desires=["desire_002"],
         source_traits=["empathy", "openness"],
         formation_strength=0.95,
-        formation_time=datetime.now(),
+        formation_time=current_time,
         state=GoalState.ACTIVE,
         current_strength=0.85,
         progress=0.5,
@@ -67,6 +69,7 @@ def create_sample_goals():
     social_goal.apply_trait_buff("empathy", 1.5)
     social_goal.apply_trait_buff("openness", 1.3)
     social_goal.apply_desire_buff("desire_002", 1.3)
+    social_goal.last_reinforcement = current_time  # Set reinforcement time
     goals[social_goal.id] = social_goal
     
     # Creative goal
@@ -77,7 +80,7 @@ def create_sample_goals():
         source_desires=["desire_003"],
         source_traits=["creativity", "openness"],
         formation_strength=0.8,
-        formation_time=datetime.now(),
+        formation_time=current_time,
         state=GoalState.ACTIVE,
         current_strength=0.7,
         progress=0.2,
@@ -86,6 +89,7 @@ def create_sample_goals():
     creative_goal.apply_trait_buff("creativity", 1.5)
     creative_goal.apply_trait_buff("openness", 1.2)
     creative_goal.apply_desire_buff("desire_003", 1.3)
+    creative_goal.last_reinforcement = current_time  # Set reinforcement time
     goals[creative_goal.id] = creative_goal
     
     return goals

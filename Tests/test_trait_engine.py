@@ -13,17 +13,15 @@ Version: 0.1.0
 
 import sys
 import os
-import time
-import pytest
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
+import pytest
 import torch
 import numpy as np
 
-from IlanyaTraitEngine.src.trait_models.trait_types import TraitType, TraitCategory, TraitDimension
-from IlanyaTraitEngine.src.trait_models.trait_data import TraitVector, TraitMatrix, TraitData, TraitDataBuilder
-from IlanyaTraitEngine.src.trait_models.trait_state import TraitState, CognitiveState
-from utils.logging_utils import setup_logger, log_test_start, log_test_end
+from Neural_Networks.IlanyaTraitEngine.trait_types import TraitType, TraitCategory, TraitDimension
+from Neural_Networks.IlanyaTraitEngine.trait_data import TraitVector, TraitMatrix, TraitData, TraitDataBuilder
+from Neural_Networks.IlanyaTraitEngine.trait_state import TraitState, CognitiveState
 
 
 class TestTraitTypes:
@@ -34,17 +32,6 @@ class TestTraitTypes:
     defined and accessible. Ensures the enum structure is correct.
     """
     
-    @classmethod
-    def setup_class(cls):
-        """Set up logger for trait types tests."""
-        cls.logger = setup_logger(
-            engine_type="trait",
-            test_type="test",
-            test_name="trait_types",
-            test_target="enum_definitions",
-            log_level="DEBUG"
-        )
-    
     def test_trait_type_enum(self):
         """
         Test that trait types are properly defined.
@@ -52,25 +39,9 @@ class TestTraitTypes:
         Verifies that trait type enums have correct string values and
         can be accessed properly.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_type_enum", 
-                      "Test that trait types are properly defined")
-        
-        try:
         assert TraitType.OPENNESS.value == "openness"
         assert TraitType.CREATIVITY.value == "creativity"
         assert TraitType.ADAPTABILITY.value == "adaptability"
-            
-            self.logger.info("Trait type enum tests passed successfully")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_type_enum", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_type_enum", False, duration)
-            raise
     
     def test_trait_categories(self):
         """
@@ -79,25 +50,9 @@ class TestTraitTypes:
         Verifies that trait categories are properly defined and
         have correct string representations.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_categories", 
-                      "Test trait categories are properly defined")
-        
-        try:
         assert TraitCategory.PERSONALITY.value == "personality"
         assert TraitCategory.COGNITIVE.value == "cognitive"
         assert TraitCategory.BEHAVIORAL.value == "behavioral"
-            
-            self.logger.info("Trait category tests passed successfully")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_categories", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_categories", False, duration)
-            raise
     
     def test_trait_dimensions(self):
         """
@@ -106,25 +61,9 @@ class TestTraitTypes:
         Verifies that trait dimensions are properly defined and
         have correct string representations.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_dimensions", 
-                      "Test trait dimensions are properly defined")
-        
-        try:
         assert TraitDimension.INTENSITY.value == "intensity"
         assert TraitDimension.STABILITY.value == "stability"
         assert TraitDimension.PLASTICITY.value == "plasticity"
-            
-            self.logger.info("Trait dimension tests passed successfully")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_dimensions", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_dimensions", False, duration)
-            raise
 
 
 class TestTraitData:
@@ -136,17 +75,6 @@ class TestTraitData:
     and basic operations.
     """
     
-    @classmethod
-    def setup_class(cls):
-        """Set up logger for trait data tests."""
-        cls.logger = setup_logger(
-            engine_type="trait",
-            test_type="test",
-            test_name="trait_data",
-            test_target="data_structures",
-            log_level="DEBUG"
-        )
-    
     def test_trait_vector_creation(self):
         """
         Test creating a trait vector.
@@ -154,11 +82,6 @@ class TestTraitData:
         Verifies that TraitVector objects can be created with valid
         parameters and that the data is stored correctly.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_vector_creation", 
-                      "Test creating a trait vector")
-        
-        try:
         trait_vector = TraitVector(
             trait_type=TraitType.OPENNESS,
             value=0.7,
@@ -168,17 +91,6 @@ class TestTraitData:
         assert trait_vector.trait_type == TraitType.OPENNESS
         assert trait_vector.value == 0.7
         assert trait_vector.confidence == 0.9
-            
-            self.logger.info(f"Trait vector created successfully: {trait_vector.trait_type.value}")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_vector_creation", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_vector_creation", False, duration)
-            raise
     
     def test_trait_vector_validation(self):
         """
@@ -187,28 +99,12 @@ class TestTraitData:
         Verifies that TraitVector properly validates input values
         and raises appropriate errors for invalid data.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_vector_validation", 
-                      "Test trait vector validation")
-        
-        try:
         # Should raise error for invalid values
         with pytest.raises(ValueError):
             TraitVector(TraitType.OPENNESS, 1.5, 0.9)  # Value > 1.0
         
         with pytest.raises(ValueError):
             TraitVector(TraitType.OPENNESS, 0.7, -0.1)  # Confidence < 0.0
-            
-            self.logger.info("Trait vector validation tests passed successfully")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_vector_validation", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_vector_validation", False, duration)
-            raise
     
     def test_trait_matrix_creation(self):
         """
@@ -217,11 +113,6 @@ class TestTraitData:
         Verifies that TraitMatrix objects can be created with multiple
         traits and that the interaction matrix is properly initialized.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_matrix_creation", 
-                      "Test creating a trait matrix")
-        
-        try:
         traits = {
             TraitType.OPENNESS: TraitVector(TraitType.OPENNESS, 0.7, 0.9),
             TraitType.CREATIVITY: TraitVector(TraitType.CREATIVITY, 0.8, 0.8)
@@ -232,17 +123,6 @@ class TestTraitData:
         assert len(trait_matrix.traits) == 2
         assert trait_matrix.interaction_matrix is not None
         assert trait_matrix.interaction_matrix.shape == (2, 2)
-            
-            self.logger.info(f"Trait matrix created successfully with {len(trait_matrix.traits)} traits")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_matrix_creation", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_matrix_creation", False, duration)
-            raise
     
     def test_trait_data_builder(self):
         """
@@ -251,11 +131,6 @@ class TestTraitData:
         Verifies that TraitDataBuilder can construct TraitData objects
         step by step and that all metadata is properly set.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_data_builder", 
-                      "Test trait data builder")
-        
-        try:
         builder = TraitDataBuilder()
         builder.add_trait(TraitType.OPENNESS, 0.7, 0.9)
         builder.add_trait(TraitType.CREATIVITY, 0.8, 0.8)
@@ -267,17 +142,6 @@ class TestTraitData:
         assert trait_data.source == "test_source"
         assert TraitType.OPENNESS in trait_data.trait_matrix.traits
         assert TraitType.CREATIVITY in trait_data.trait_matrix.traits
-            
-            self.logger.info(f"Trait data builder test passed: {trait_data.get_trait_count()} traits")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_data_builder", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_data_builder", False, duration)
-            raise
 
 
 class TestTraitState:
@@ -288,17 +152,6 @@ class TestTraitState:
     state tracking and cognitive state management over time.
     """
     
-    @classmethod
-    def setup_class(cls):
-        """Set up logger for trait state tests."""
-        cls.logger = setup_logger(
-            engine_type="trait",
-            test_type="test",
-            test_name="trait_state",
-            test_target="state_management",
-            log_level="DEBUG"
-        )
-    
     def test_trait_state_creation(self):
         """
         Test creating a trait state.
@@ -306,11 +159,6 @@ class TestTraitState:
         Verifies that TraitState objects can be created with valid
         parameters and that change rates are computed correctly.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "trait_state_creation", 
-                      "Test creating a trait state")
-        
-        try:
         trait_state = TraitState(
             trait_type=TraitType.OPENNESS,
             current_value=0.7,
@@ -321,19 +169,8 @@ class TestTraitState:
         assert trait_state.trait_type == TraitType.OPENNESS
         assert trait_state.current_value == 0.7
         assert trait_state.previous_value == 0.6
-            assert trait_state.change_rate == pytest.approx(0.1, rel=1e-10)  # Use pytest.approx for floating point
+        assert trait_state.change_rate == 0.1  # 0.7 - 0.6
         assert trait_state.confidence == 0.9
-            
-            self.logger.info(f"Trait state created successfully: change_rate={trait_state.change_rate}")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "trait_state_creation", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "trait_state_creation", False, duration)
-            raise
     
     def test_cognitive_state_creation(self):
         """
@@ -342,11 +179,6 @@ class TestTraitState:
         Verifies that CognitiveState objects can be created with
         multiple trait states and cognitive metrics.
         """
-        start_time = time.time()
-        log_test_start(self.logger, "cognitive_state_creation", 
-                      "Test creating a cognitive state")
-        
-        try:
         trait_states = {
             TraitType.OPENNESS: TraitState(TraitType.OPENNESS, 0.7, confidence=0.9),
             TraitType.CREATIVITY: TraitState(TraitType.CREATIVITY, 0.8, confidence=0.8)
@@ -361,22 +193,28 @@ class TestTraitState:
         )
         
         assert len(cognitive_state.trait_states) == 2
-            # The overall_stability is computed internally, so we need to check the actual computed value
-            assert cognitive_state.overall_stability == pytest.approx(1.0, rel=1e-10)  # Default value when no previous state
+        assert cognitive_state.overall_stability == 0.8
         assert cognitive_state.cognitive_load == 0.3
         assert cognitive_state.attention_focus == 0.9
         assert cognitive_state.emotional_state == 0.6
     
-            self.logger.info(f"Cognitive state created successfully with {len(cognitive_state.trait_states)} trait states")
-            
-            duration = time.time() - start_time
-            log_test_end(self.logger, "cognitive_state_creation", True, duration)
-            
-        except Exception as e:
-            duration = time.time() - start_time
-            self.logger.error(f"Test failed with error: {str(e)}")
-            log_test_end(self.logger, "cognitive_state_creation", False, duration)
-            raise
+    def test_cognitive_state_validation(self):
+        """
+        Test cognitive state validation.
+        
+        Verifies that CognitiveState properly validates input values
+        and raises appropriate errors for invalid data.
+        """
+        trait_states = {
+            TraitType.OPENNESS: TraitState(TraitType.OPENNESS, 0.7, confidence=0.9)
+        }
+        
+        # Should raise error for invalid values
+        with pytest.raises(ValueError):
+            CognitiveState(trait_states, overall_stability=1.5)  # > 1.0
+        
+        with pytest.raises(ValueError):
+            CognitiveState(trait_states, cognitive_load=-0.1)  # < 0.0
 
 
 class TestNeuralNetworkComponents:
@@ -394,7 +232,7 @@ class TestNeuralNetworkComponents:
         Verifies that the TraitEmbedding layer can process trait data
         and produce embeddings of the correct shape.
         """
-        from IlanyaTraitEngine.src.neural_networks.trait_transformer import TraitEmbedding
+        from Neural_Networks.IlanyaTraitEngine.trait_transformer import TraitEmbedding
         
         embedding = TraitEmbedding(num_traits=20, embedding_dim=64, input_dim=512)
         
@@ -415,7 +253,7 @@ class TestNeuralNetworkComponents:
         Verifies that the PositionalEncoding layer adds position
         information to embeddings and produces different outputs.
         """
-        from IlanyaTraitEngine.src.neural_networks.trait_transformer import PositionalEncoding
+        from Neural_Networks.IlanyaTraitEngine.trait_transformer import PositionalEncoding
         
         pos_encoding = PositionalEncoding(embedding_dim=64, max_seq_length=100)
         
@@ -430,4 +268,4 @@ class TestNeuralNetworkComponents:
 
 
 if __name__ == "__main__":
-    pytest.main() 
+    pytest.main([__file__]) 

@@ -162,8 +162,8 @@ def main():
                   "Demonstrates the modular Desire Engine with comprehensive logging and emergent desire creation")
     
     try:
-        print("🚀 Ilanya Desire Engine - Modular Demo with Logging")
-        print("=" * 60)
+    print("🚀 Ilanya Desire Engine - Modular Demo with Logging")
+    print("=" * 60)
         
         # Get log file path for configuration
         log_file = get_log_file_path(
@@ -172,63 +172,63 @@ def main():
             test_name="modular_desire_engine",
             test_target="emergent_desires"
         )
-        
-        # Create configuration with comprehensive logging and lower thresholds for demo
-        config = DesireEngineConfig(
-            log_level="INFO",
+    
+    # Create configuration with comprehensive logging and lower thresholds for demo
+    config = DesireEngineConfig(
+        log_level="INFO",
             log_file=log_file,
-            log_desire_creation=True,
-            log_desire_reinforcement=True,
-            log_desire_decay=True,
-            log_desire_pruning=True,
-            log_interactions=True,
-            log_emergent_desires=True,
-            log_goal_candidates=True,
-            log_metrics=True,
-            # Lower thresholds for demo to ensure desires are created
-            reinforcement_threshold=0.01,
-            pruning_threshold=0.05,
-            interaction_threshold=0.1,
-            synergy_threshold=0.3,
-            emergent_threshold=0.4,
-            conflict_threshold=0.2,
-            # Faster processing for demo
-            decay_check_interval=30,
-            pruning_check_interval=60
-        )
-        
-        # Initialize the desire engine
+        log_desire_creation=True,
+        log_desire_reinforcement=True,
+        log_desire_decay=True,
+        log_desire_pruning=True,
+        log_interactions=True,
+        log_emergent_desires=True,
+        log_goal_candidates=True,
+        log_metrics=True,
+        # Lower thresholds for demo to ensure desires are created
+        reinforcement_threshold=0.01,
+        pruning_threshold=0.05,
+        interaction_threshold=0.1,
+        synergy_threshold=0.3,
+        emergent_threshold=0.4,
+        conflict_threshold=0.2,
+        # Faster processing for demo
+        decay_check_interval=30,
+        pruning_check_interval=60
+    )
+    
+    # Initialize the desire engine
         logger.info("Initializing Desire Engine...")
-        print("Initializing Desire Engine...")
-        desire_engine = DesireEngine(config)
-        
-        # Create sample trait states
-        trait_states = create_sample_trait_states()
-        
+    print("Initializing Desire Engine...")
+    desire_engine = DesireEngine(config)
+    
+    # Create sample trait states
+    trait_states = create_sample_trait_states()
+    
         logger.info(f"Created {len(trait_states)} sample trait states")
-        print(f"Created {len(trait_states)} sample trait states")
-        print("Starting desire processing simulation...")
-        
-        # Process trait activations for multiple iterations
-        for iteration in range(1, 6):
+    print(f"Created {len(trait_states)} sample trait states")
+    print("Starting desire processing simulation...")
+    
+    # Process trait activations for multiple iterations
+    for iteration in range(1, 6):
             logger.info(f"Processing iteration {iteration}")
-            print(f"\n🔄 Processing iteration {iteration}...")
-            
-            # Process trait activations
-            results = desire_engine.process_trait_activations(trait_states)
-            
-            # Print summary
-            print_desire_summary(desire_engine, iteration)
-            
-            # Simulate some time passing
-            if iteration < 5:
-                logger.info("Waiting 2 seconds before next iteration")
-                print(f"\n⏰ Waiting 2 seconds before next iteration...")
-                time.sleep(2)
+        print(f"\n🔄 Processing iteration {iteration}...")
         
-        # Demonstrate neural embeddings and attention
+        # Process trait activations
+        results = desire_engine.process_trait_activations(trait_states)
+        
+        # Print summary
+        print_desire_summary(desire_engine, iteration)
+        
+        # Simulate some time passing
+        if iteration < 5:
+                logger.info("Waiting 2 seconds before next iteration")
+            print(f"\n⏰ Waiting 2 seconds before next iteration...")
+            time.sleep(2)
+    
+    # Demonstrate neural embeddings and attention
         logger.info("Computing desire embeddings and attention")
-        print(f"\n🧠 Computing desire embeddings and attention...")
+    print(f"\n🧠 Computing desire embeddings and attention...")
         
         # Get embeddings for all desires
         desire_list = list(desire_engine.desires.values())
@@ -236,7 +236,7 @@ def main():
         
         logger.info(f"Generated embeddings for {len(embeddings)} desires")
         print(f"Generated embeddings for {len(embeddings)} desires")
-        print(f"Embedding shape: {embeddings.shape}")
+    print(f"Embedding shape: {embeddings.shape}")
         
         # Show some embedding statistics
         print("\nEmbedding Statistics:")

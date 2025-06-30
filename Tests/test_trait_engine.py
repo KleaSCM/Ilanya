@@ -57,9 +57,9 @@ class TestTraitTypes:
                       "Test that trait types are properly defined")
         
         try:
-            assert TraitType.OPENNESS.value == "openness"
-            assert TraitType.CREATIVITY.value == "creativity"
-            assert TraitType.ADAPTABILITY.value == "adaptability"
+        assert TraitType.OPENNESS.value == "openness"
+        assert TraitType.CREATIVITY.value == "creativity"
+        assert TraitType.ADAPTABILITY.value == "adaptability"
             
             self.logger.info("Trait type enum tests passed successfully")
             
@@ -84,9 +84,9 @@ class TestTraitTypes:
                       "Test trait categories are properly defined")
         
         try:
-            assert TraitCategory.PERSONALITY.value == "personality"
-            assert TraitCategory.COGNITIVE.value == "cognitive"
-            assert TraitCategory.BEHAVIORAL.value == "behavioral"
+        assert TraitCategory.PERSONALITY.value == "personality"
+        assert TraitCategory.COGNITIVE.value == "cognitive"
+        assert TraitCategory.BEHAVIORAL.value == "behavioral"
             
             self.logger.info("Trait category tests passed successfully")
             
@@ -111,9 +111,9 @@ class TestTraitTypes:
                       "Test trait dimensions are properly defined")
         
         try:
-            assert TraitDimension.INTENSITY.value == "intensity"
-            assert TraitDimension.STABILITY.value == "stability"
-            assert TraitDimension.PLASTICITY.value == "plasticity"
+        assert TraitDimension.INTENSITY.value == "intensity"
+        assert TraitDimension.STABILITY.value == "stability"
+        assert TraitDimension.PLASTICITY.value == "plasticity"
             
             self.logger.info("Trait dimension tests passed successfully")
             
@@ -159,15 +159,15 @@ class TestTraitData:
                       "Test creating a trait vector")
         
         try:
-            trait_vector = TraitVector(
-                trait_type=TraitType.OPENNESS,
-                value=0.7,
-                confidence=0.9
-            )
-            
-            assert trait_vector.trait_type == TraitType.OPENNESS
-            assert trait_vector.value == 0.7
-            assert trait_vector.confidence == 0.9
+        trait_vector = TraitVector(
+            trait_type=TraitType.OPENNESS,
+            value=0.7,
+            confidence=0.9
+        )
+        
+        assert trait_vector.trait_type == TraitType.OPENNESS
+        assert trait_vector.value == 0.7
+        assert trait_vector.confidence == 0.9
             
             self.logger.info(f"Trait vector created successfully: {trait_vector.trait_type.value}")
             
@@ -192,12 +192,12 @@ class TestTraitData:
                       "Test trait vector validation")
         
         try:
-            # Should raise error for invalid values
-            with pytest.raises(ValueError):
-                TraitVector(TraitType.OPENNESS, 1.5, 0.9)  # Value > 1.0
-            
-            with pytest.raises(ValueError):
-                TraitVector(TraitType.OPENNESS, 0.7, -0.1)  # Confidence < 0.0
+        # Should raise error for invalid values
+        with pytest.raises(ValueError):
+            TraitVector(TraitType.OPENNESS, 1.5, 0.9)  # Value > 1.0
+        
+        with pytest.raises(ValueError):
+            TraitVector(TraitType.OPENNESS, 0.7, -0.1)  # Confidence < 0.0
             
             self.logger.info("Trait vector validation tests passed successfully")
             
@@ -222,16 +222,16 @@ class TestTraitData:
                       "Test creating a trait matrix")
         
         try:
-            traits = {
-                TraitType.OPENNESS: TraitVector(TraitType.OPENNESS, 0.7, 0.9),
-                TraitType.CREATIVITY: TraitVector(TraitType.CREATIVITY, 0.8, 0.8)
-            }
-            
-            trait_matrix = TraitMatrix(traits=traits)
-            
-            assert len(trait_matrix.traits) == 2
-            assert trait_matrix.interaction_matrix is not None
-            assert trait_matrix.interaction_matrix.shape == (2, 2)
+        traits = {
+            TraitType.OPENNESS: TraitVector(TraitType.OPENNESS, 0.7, 0.9),
+            TraitType.CREATIVITY: TraitVector(TraitType.CREATIVITY, 0.8, 0.8)
+        }
+        
+        trait_matrix = TraitMatrix(traits=traits)
+        
+        assert len(trait_matrix.traits) == 2
+        assert trait_matrix.interaction_matrix is not None
+        assert trait_matrix.interaction_matrix.shape == (2, 2)
             
             self.logger.info(f"Trait matrix created successfully with {len(trait_matrix.traits)} traits")
             
@@ -256,17 +256,17 @@ class TestTraitData:
                       "Test trait data builder")
         
         try:
-            builder = TraitDataBuilder()
-            builder.add_trait(TraitType.OPENNESS, 0.7, 0.9)
-            builder.add_trait(TraitType.CREATIVITY, 0.8, 0.8)
-            builder.set_source("test_source")
-            
-            trait_data = builder.build()
-            
-            assert trait_data.get_trait_count() == 2
-            assert trait_data.source == "test_source"
-            assert TraitType.OPENNESS in trait_data.trait_matrix.traits
-            assert TraitType.CREATIVITY in trait_data.trait_matrix.traits
+        builder = TraitDataBuilder()
+        builder.add_trait(TraitType.OPENNESS, 0.7, 0.9)
+        builder.add_trait(TraitType.CREATIVITY, 0.8, 0.8)
+        builder.set_source("test_source")
+        
+        trait_data = builder.build()
+        
+        assert trait_data.get_trait_count() == 2
+        assert trait_data.source == "test_source"
+        assert TraitType.OPENNESS in trait_data.trait_matrix.traits
+        assert TraitType.CREATIVITY in trait_data.trait_matrix.traits
             
             self.logger.info(f"Trait data builder test passed: {trait_data.get_trait_count()} traits")
             
@@ -311,18 +311,18 @@ class TestTraitState:
                       "Test creating a trait state")
         
         try:
-            trait_state = TraitState(
-                trait_type=TraitType.OPENNESS,
-                current_value=0.7,
-                previous_value=0.6,
-                confidence=0.9
-            )
-            
-            assert trait_state.trait_type == TraitType.OPENNESS
-            assert trait_state.current_value == 0.7
-            assert trait_state.previous_value == 0.6
+        trait_state = TraitState(
+            trait_type=TraitType.OPENNESS,
+            current_value=0.7,
+            previous_value=0.6,
+            confidence=0.9
+        )
+        
+        assert trait_state.trait_type == TraitType.OPENNESS
+        assert trait_state.current_value == 0.7
+        assert trait_state.previous_value == 0.6
             assert trait_state.change_rate == pytest.approx(0.1, rel=1e-10)  # Use pytest.approx for floating point
-            assert trait_state.confidence == 0.9
+        assert trait_state.confidence == 0.9
             
             self.logger.info(f"Trait state created successfully: change_rate={trait_state.change_rate}")
             
@@ -347,26 +347,26 @@ class TestTraitState:
                       "Test creating a cognitive state")
         
         try:
-            trait_states = {
-                TraitType.OPENNESS: TraitState(TraitType.OPENNESS, 0.7, confidence=0.9),
-                TraitType.CREATIVITY: TraitState(TraitType.CREATIVITY, 0.8, confidence=0.8)
-            }
-            
-            cognitive_state = CognitiveState(
-                trait_states=trait_states,
-                overall_stability=0.8,
-                cognitive_load=0.3,
-                attention_focus=0.9,
-                emotional_state=0.6
-            )
-            
-            assert len(cognitive_state.trait_states) == 2
+        trait_states = {
+            TraitType.OPENNESS: TraitState(TraitType.OPENNESS, 0.7, confidence=0.9),
+            TraitType.CREATIVITY: TraitState(TraitType.CREATIVITY, 0.8, confidence=0.8)
+        }
+        
+        cognitive_state = CognitiveState(
+            trait_states=trait_states,
+            overall_stability=0.8,
+            cognitive_load=0.3,
+            attention_focus=0.9,
+            emotional_state=0.6
+        )
+        
+        assert len(cognitive_state.trait_states) == 2
             # The overall_stability is computed internally, so we need to check the actual computed value
             assert cognitive_state.overall_stability == pytest.approx(1.0, rel=1e-10)  # Default value when no previous state
-            assert cognitive_state.cognitive_load == 0.3
-            assert cognitive_state.attention_focus == 0.9
-            assert cognitive_state.emotional_state == 0.6
-            
+        assert cognitive_state.cognitive_load == 0.3
+        assert cognitive_state.attention_focus == 0.9
+        assert cognitive_state.emotional_state == 0.6
+    
             self.logger.info(f"Cognitive state created successfully with {len(cognitive_state.trait_states)} trait states")
             
             duration = time.time() - start_time

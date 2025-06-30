@@ -81,66 +81,66 @@ class TestEmergentDesires(unittest.TestCase):
                       "Test that emergent desires are created when synergy exceeds threshold")
         
         try:
-            # Create two desires with high synergy potential and common traits
-            desire_1 = Desire(
-                id="test_desire_1",
-                name="Desire for Creativity",
-                source_traits=["creativity", "innovation"],
-                strength=0.8,
-                base_strength=0.8,
-                reinforcement_count=3,
-                last_reinforcement=datetime.now()
-            )
-            
-            desire_2 = Desire(
-                id="test_desire_2", 
-                name="Desire for Learning",
-                source_traits=["learning_desire", "creativity"],
-                strength=0.7,
-                base_strength=0.7,
-                reinforcement_count=2,
-                last_reinforcement=datetime.now()
-            )
+        # Create two desires with high synergy potential and common traits
+        desire_1 = Desire(
+            id="test_desire_1",
+            name="Desire for Creativity",
+            source_traits=["creativity", "innovation"],
+            strength=0.8,
+            base_strength=0.8,
+            reinforcement_count=3,
+            last_reinforcement=datetime.now()
+        )
+        
+        desire_2 = Desire(
+            id="test_desire_2", 
+            name="Desire for Learning",
+            source_traits=["learning_desire", "creativity"],
+            strength=0.7,
+            base_strength=0.7,
+            reinforcement_count=2,
+            last_reinforcement=datetime.now()
+        )
             
             self.logger.info(f"Created test desires: {desire_1.name}, {desire_2.name}")
-            
-            # Add desires to engine
-            self.desire_engine.desires["test_desire_1"] = desire_1
-            self.desire_engine.desires["test_desire_2"] = desire_2
-            
-            # Process interactions
-            interaction_results = self.desire_engine.interaction_module.process_interactions(
-                self.desire_engine.desires
-            )
+        
+        # Add desires to engine
+        self.desire_engine.desires["test_desire_1"] = desire_1
+        self.desire_engine.desires["test_desire_2"] = desire_2
+        
+        # Process interactions
+        interaction_results = self.desire_engine.interaction_module.process_interactions(
+            self.desire_engine.desires
+        )
             
             self.logger.info(f"Processed interactions, got {len(interaction_results)} results")
-            
-            # Check that interactions were processed
-            self.assertIsInstance(interaction_results, list)
-            
-            # Check for emergent desire creation
-            emergent_desires = [
-                d for d in self.desire_engine.desires.values() 
-                if d.emergent
-            ]
+        
+        # Check that interactions were processed
+        self.assertIsInstance(interaction_results, list)
+        
+        # Check for emergent desire creation
+        emergent_desires = [
+            d for d in self.desire_engine.desires.values() 
+            if d.emergent
+        ]
             
             self.logger.info(f"Found {len(emergent_desires)} emergent desires")
-            
-            # Should have created at least one emergent desire
-            self.assertGreater(len(emergent_desires), 0, 
-                              "No emergent desires were created")
-            
-            # Check emergent desire properties
-            emergent = emergent_desires[0]
-            self.assertTrue(emergent.emergent, "Desire should be marked as emergent")
-            self.assertIn("test_desire_1", emergent.id, "Emergent ID should reference parent desires")
-            self.assertIn("test_desire_2", emergent.id, "Emergent ID should reference parent desires")
-            self.assertIn("creativity", emergent.source_traits, "Should inherit source traits")
-            self.assertIn("learning_desire", emergent.source_traits, "Should inherit source traits")
-            
-            # Check that emergent desire has reasonable strength
-            self.assertGreater(emergent.strength, 0.0, "Emergent desire should have positive strength")
-            self.assertLessEqual(emergent.strength, 1.0, "Emergent desire strength should not exceed 1.0")
+        
+        # Should have created at least one emergent desire
+        self.assertGreater(len(emergent_desires), 0, 
+                          "No emergent desires were created")
+        
+        # Check emergent desire properties
+        emergent = emergent_desires[0]
+        self.assertTrue(emergent.emergent, "Desire should be marked as emergent")
+        self.assertIn("test_desire_1", emergent.id, "Emergent ID should reference parent desires")
+        self.assertIn("test_desire_2", emergent.id, "Emergent ID should reference parent desires")
+        self.assertIn("creativity", emergent.source_traits, "Should inherit source traits")
+        self.assertIn("learning_desire", emergent.source_traits, "Should inherit source traits")
+        
+        # Check that emergent desire has reasonable strength
+        self.assertGreater(emergent.strength, 0.0, "Emergent desire should have positive strength")
+        self.assertLessEqual(emergent.strength, 1.0, "Emergent desire strength should not exceed 1.0")
             
             self.logger.info(f"Emergent desire created successfully: {emergent.name} (ID: {emergent.id})")
             self.logger.info(f"Emergent desire strength: {emergent.strength}")
@@ -162,50 +162,50 @@ class TestEmergentDesires(unittest.TestCase):
                       "Test that emergent desire creation is properly logged")
         
         try:
-            # Create desires with high synergy and common traits
-            desire_1 = Desire(
-                id="log_test_1",
-                name="Desire for Adventure",
-                source_traits=["openness_to_experience", "exploration"],
-                strength=0.9,
-                base_strength=0.9,
-                reinforcement_count=5,
-                last_reinforcement=datetime.now()
-            )
-            
-            desire_2 = Desire(
-                id="log_test_2",
-                name="Desire for Exploration", 
-                source_traits=["curiosity", "exploration"],
-                strength=0.8,
-                base_strength=0.8,
-                reinforcement_count=4,
-                last_reinforcement=datetime.now()
-            )
+        # Create desires with high synergy and common traits
+        desire_1 = Desire(
+            id="log_test_1",
+            name="Desire for Adventure",
+            source_traits=["openness_to_experience", "exploration"],
+            strength=0.9,
+            base_strength=0.9,
+            reinforcement_count=5,
+            last_reinforcement=datetime.now()
+        )
+        
+        desire_2 = Desire(
+            id="log_test_2",
+            name="Desire for Exploration", 
+            source_traits=["curiosity", "exploration"],
+            strength=0.8,
+            base_strength=0.8,
+            reinforcement_count=4,
+            last_reinforcement=datetime.now()
+        )
             
             self.logger.info(f"Created logging test desires: {desire_1.name}, {desire_2.name}")
-            
-            self.desire_engine.desires["log_test_1"] = desire_1
-            self.desire_engine.desires["log_test_2"] = desire_2
-            
-            # Process interactions
-            self.desire_engine.interaction_module.process_interactions(
-                self.desire_engine.desires
-            )
+        
+        self.desire_engine.desires["log_test_1"] = desire_1
+        self.desire_engine.desires["log_test_2"] = desire_2
+        
+        # Process interactions
+        self.desire_engine.interaction_module.process_interactions(
+            self.desire_engine.desires
+        )
             
             self.logger.info("Interactions processed, checking log file content")
-            
-            # Check log file for emergent desire creation message
+        
+        # Check log file for emergent desire creation message
             with open(self.config.log_file, 'r') as f:
-                log_content = f.read()
-            
-            # Should contain emergent desire creation log
-            self.assertIn("Created emergent desire", log_content,
-                         "Log should contain emergent desire creation message")
-            
-            # Should contain interaction logging
-            self.assertIn("Interaction:", log_content,
-                         "Log should contain interaction messages")
+            log_content = f.read()
+        
+        # Should contain emergent desire creation log
+        self.assertIn("Created emergent desire", log_content,
+                     "Log should contain emergent desire creation message")
+        
+        # Should contain interaction logging
+        self.assertIn("Interaction:", log_content,
+                     "Log should contain interaction messages")
             
             self.logger.info("Logging verification completed successfully")
             
@@ -225,48 +225,48 @@ class TestEmergentDesires(unittest.TestCase):
                       "Test that emergent desires are only created above threshold")
         
         try:
-            # Create desires with low synergy (below emergent threshold)
-            desire_1 = Desire(
-                id="low_synergy_1",
-                name="Desire for Quiet",
-                source_traits=["introversion"],
-                strength=0.3,
-                base_strength=0.3,
-                reinforcement_count=1,
-                last_reinforcement=datetime.now()
-            )
-            
-            desire_2 = Desire(
-                id="low_synergy_2",
-                name="Desire for Solitude",
-                source_traits=["independence"],
-                strength=0.2,
-                base_strength=0.2,
-                reinforcement_count=1,
-                last_reinforcement=datetime.now()
-            )
+        # Create desires with low synergy (below emergent threshold)
+        desire_1 = Desire(
+            id="low_synergy_1",
+            name="Desire for Quiet",
+            source_traits=["introversion"],
+            strength=0.3,
+            base_strength=0.3,
+            reinforcement_count=1,
+            last_reinforcement=datetime.now()
+        )
+        
+        desire_2 = Desire(
+            id="low_synergy_2",
+            name="Desire for Solitude",
+            source_traits=["independence"],
+            strength=0.2,
+            base_strength=0.2,
+            reinforcement_count=1,
+            last_reinforcement=datetime.now()
+        )
             
             self.logger.info(f"Created low synergy desires: {desire_1.name}, {desire_2.name}")
-            
-            self.desire_engine.desires["low_synergy_1"] = desire_1
-            self.desire_engine.desires["low_synergy_2"] = desire_2
-            
-            # Count desires before interaction
-            initial_count = len(self.desire_engine.desires)
+        
+        self.desire_engine.desires["low_synergy_1"] = desire_1
+        self.desire_engine.desires["low_synergy_2"] = desire_2
+        
+        # Count desires before interaction
+        initial_count = len(self.desire_engine.desires)
             self.logger.info(f"Initial desire count: {initial_count}")
-            
-            # Process interactions
-            self.desire_engine.interaction_module.process_interactions(
-                self.desire_engine.desires
-            )
-            
-            # Count desires after interaction
-            final_count = len(self.desire_engine.desires)
+        
+        # Process interactions
+        self.desire_engine.interaction_module.process_interactions(
+            self.desire_engine.desires
+        )
+        
+        # Count desires after interaction
+        final_count = len(self.desire_engine.desires)
             self.logger.info(f"Final desire count: {final_count}")
-            
-            # Should not create emergent desire due to low synergy
-            self.assertEqual(initial_count, final_count,
-                            "Should not create emergent desire with low synergy")
+        
+        # Should not create emergent desire due to low synergy
+        self.assertEqual(initial_count, final_count,
+                        "Should not create emergent desire with low synergy")
             
             self.logger.info("Threshold test completed successfully - no emergent desires created")
             

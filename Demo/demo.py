@@ -244,23 +244,23 @@ def main():
     try:
         print("🧠 Ilanya Trait Engine - Simple Demo")
         print("=" * 50)
-        
+    
         # Initialize the trait engine
         logger.info("Initializing Simple Trait Engine...")
         print("Initializing Simple Trait Engine...")
         trait_engine = SimpleTraitEngine(num_traits=5, embedding_dim=32)
-        
-        # Create sample traits
+    
+    # Create sample traits
         logger.info("Creating sample traits...")
         print("Creating sample traits...")
         sample_traits = {
             TraitType.OPENNESS: TraitVector(TraitType.OPENNESS, 0.8, 0.9),
             TraitType.CREATIVITY: TraitVector(TraitType.CREATIVITY, 0.7, 0.8),
-            TraitType.ADAPTABILITY: TraitVector(TraitType.ADAPTABILITY, 0.6, 0.7),
+        TraitType.ADAPTABILITY: TraitVector(TraitType.ADAPTABILITY, 0.6, 0.7),
             TraitType.EMOTIONAL_STABILITY: TraitVector(TraitType.EMOTIONAL_STABILITY, 0.9, 0.8),
             TraitType.LEARNING_RATE: TraitVector(TraitType.LEARNING_RATE, 0.8, 0.9)
-        }
-        
+    }
+    
         logger.info(f"Created {len(sample_traits)} sample traits")
         print(f"Created {len(sample_traits)} sample traits:")
         for trait_type, trait_vector in sample_traits.items():
@@ -273,7 +273,7 @@ def main():
         
         logger.info("Neural network processing completed")
         print("Neural network processing completed!")
-        
+    
         # Display predictions
         print("\n📊 Trait Predictions:")
         predicted_traits = results['predicted_traits']
@@ -287,19 +287,19 @@ def main():
             signal = evolution_signals[i]
             direction = "↗️" if signal > 0 else "↘️" if signal < 0 else "➡️"
             print(f"  {trait_type.value}: {signal:+.3f} {direction}")
-        
+    
         # Demonstrate trait evolution
         logger.info("Demonstrating trait evolution...")
         print("\n🌱 Demonstrating trait evolution...")
         
         # Create experience that should influence traits
-        experience = {
+    experience = {
             "creative_activity": 0.8,
             "learning_opportunity": 0.9,
             "stressful_situation": 0.3,
             "social_interaction": 0.6
-        }
-        
+    }
+    
         logger.info(f"Applying experience: {experience}")
         print(f"Applying experience: {experience}")
         

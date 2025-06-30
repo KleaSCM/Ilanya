@@ -86,42 +86,59 @@ class GoalsEngine:
     
     def update_goals(self, time_delta: timedelta) -> Dict[str, Any]:
         """
-        Update all active goals and apply mathematical controls.
+        Update all active goals and apply system-wide effects.
+        
+        This method orchestrates the complete goal update cycle including
+        progress updates, buffing, resolution checks, and stability controls.
         
         Args:
-            time_delta: Time passed since last update
+            time_delta: Time elapsed since last update
             
         Returns:
             Dictionary containing update results and system metrics
         """
-        current_time = datetime.now()
+        self.logger.debug(f"Updating {len(self.active_goals)} active goals")
         
-        # Update goal monitoring
-        monitoring_results = self.monitor.update_goals(self.active_goals, time_delta)
+        # Step 1: Update goal progress and decay buffs
+        for goal in self.active_goals.values():
+            goal.decay_buffs(time_delta)
+            # Simulate progress increase (in real system, this would come from actual work)
+            if goal.state == GoalState.ACTIVE:
+                progress_increase = 0.002 * time_delta.total_seconds()  # Small progress per second
+                new_progress = min(1.0, goal.progress + progress_increase)
+                goal.update_progress(new_progress)
         
-        # Apply goal buffs to traits and desires
-        buff_results = self._apply_goal_buffs()
+        # Step 2: Apply goal buffs to traits and desires
+        buffing_results = self._apply_goal_buffs()
         
-        # Check for goal resolution
+        # Step 3: Check for goal resolution (completion, failure, etc.)
         resolution_results = self._check_goal_resolution()
         
-        # Apply mathematical stability controls
+        # Step 4: Apply stability controls
         stability_results = self._apply_stability_controls()
         
-        # Prune unreinforced goals
+        # Step 5: Resolve resource conflicts
+        conflict_results = self._resolve_resource_conflicts(list(self.active_goals.values()))
+        
+        # Step 6: Prune goals that should be removed
         pruning_results = self._prune_goals()
         
-        # Update system metrics
+        # Step 7: Update system metrics
         self._update_system_metrics()
         
-        return {
-            'monitoring': monitoring_results,
-            'buffing': buff_results,
-            'resolution': resolution_results,
-            'stability': stability_results,
-            'pruning': pruning_results,
+        # Combine all results
+        update_results = {
+            'active_goals': len(self.active_goals),
+            'total_goals': len(self.goal_history),
+            'buffing_results': buffing_results,
+            'resolution_results': resolution_results,
+            'stability_results': stability_results,
+            'conflict_results': conflict_results,
+            'pruning_results': pruning_results,
             'system_metrics': self._get_system_metrics()
         }
+        
+        return update_results
     
     def _apply_goal_buffs(self) -> Dict[str, Any]:
         """Apply goal buffs to traits and desires."""
@@ -626,4 +643,143 @@ class GoalsEngine:
         # Update metrics
         self._update_system_metrics()
         
-        self.logger.info(f"Loaded Goals Engine state with {len(self.active_goals)} active goals") 
+        self.logger.info(f"Loaded Goals Engine state with {len(self.active_goals)} active goals")
+    
+    def _resolve_resource_conflicts(self, goals: List[Goal]) -> Dict[str, Any]:
+        """
+        Resolve resource conflicts between goals by adjusting resource allocations.
+        
+        This implements intelligent resource conflict resolution that considers
+        goal priorities, strengths, and dependencies to optimize resource allocation.
+        
+        Args:
+            goals: List of active goals
+            
+        Returns:
+            Dictionary containing resolution results and adjustments
+        """
+        if len(goals) < 2:
+            return {'resolved_conflicts': [], 'adjustments': {}}
+        
+        resolved_conflicts = []
+        adjustments = {}
+        
+        # Find all resource conflicts between goals
+        for i, goal1 in enumerate(goals):
+            for j, goal2 in enumerate(goals[i+1:], i+1):
+                conflicts = goal1.get_resource_conflicts(goal2)
+                
+                for conflict_type in conflicts:
+                    # Calculate current resource usage
+                    req1 = goal1.get_total_resource_requirement(conflict_type)
+                    req2 = goal2.get_total_resource_requirement(conflict_type)
+                    total_required = req1 + req2
+                    
+                    if total_required > 1.0:
+                        # Resolve conflict using multiple strategies
+                        resolution = self._resolve_single_resource_conflict(
+                            goal1, goal2, conflict_type, req1, req2
+                        )
+                        
+                        if resolution:
+                            resolved_conflicts.append({
+                                'goal1_id': goal1.id,
+                                'goal2_id': goal2.id,
+                                'resource_type': conflict_type,
+                                'original_usage': total_required,
+                                'resolution': resolution
+                            })
+                            
+                            # Apply adjustments
+                            if goal1.id not in adjustments:
+                                adjustments[goal1.id] = {}
+                            if goal2.id not in adjustments:
+                                adjustments[goal2.id] = {}
+                            
+                            adjustments[goal1.id][conflict_type] = resolution['goal1_adjustment']
+                            adjustments[goal2.id][conflict_type] = resolution['goal2_adjustment']
+        
+        return {
+            'resolved_conflicts': resolved_conflicts,
+            'adjustments': adjustments
+        }
+    
+    def _resolve_single_resource_conflict(self, goal1: Goal, goal2: Goal, 
+                                        resource_type: str, req1: float, req2: float) -> Optional[Dict]:
+        """
+        Resolve a single resource conflict between two goals.
+        
+        Args:
+            goal1: First goal
+            goal2: Second goal
+            resource_type: Type of resource in conflict
+            req1: Current requirement of goal1
+            req2: Current requirement of goal2
+            
+        Returns:
+            Resolution strategy with adjustments for both goals
+        """
+        # Strategy 1: Priority-based allocation
+        priority1 = self._calculate_goal_priority(goal1, resource_type)
+        priority2 = self._calculate_goal_priority(goal2, resource_type)
+        
+        # Strategy 2: Strength-based allocation
+        strength1 = goal1.current_strength
+        strength2 = goal2.current_strength
+        
+        # Strategy 3: Progress-based allocation (favor goals closer to completion)
+        progress1 = goal1.progress
+        progress2 = goal2.progress
+        
+        # Strategy 4: Dependency-based allocation (favor prerequisite goals)
+        dependency1 = self._calculate_dependency_priority(goal1)
+        dependency2 = self._calculate_dependency_priority(goal2)
+        
+        # Calculate combined priority scores
+        score1 = (priority1 * 0.4 + strength1 * 0.3 + progress1 * 0.2 + dependency1 * 0.1)
+        score2 = (priority2 * 0.4 + strength2 * 0.3 + progress2 * 0.2 + dependency2 * 0.1)
+        
+        # Normalize scores
+        total_score = score1 + score2
+        if total_score == 0:
+            # Fallback to equal allocation
+            score1 = score2 = 0.5
+        else:
+            score1 /= total_score
+            score2 /= total_score
+        
+        # Calculate new allocations
+        available_resource = 1.0
+        new_req1 = min(req1, available_resource * score1)
+        new_req2 = min(req2, available_resource * score2)
+        
+        # Ensure we don't exceed available resources
+        if new_req1 + new_req2 > available_resource:
+            # Scale down proportionally
+            scale_factor = available_resource / (new_req1 + new_req2)
+            new_req1 *= scale_factor
+            new_req2 *= scale_factor
+        
+        return {
+            'goal1_adjustment': new_req1,
+            'goal2_adjustment': new_req2,
+            'resolution_method': 'priority_strength_progress_dependency',
+            'goal1_score': score1,
+            'goal2_score': score2
+        }
+    
+    def _calculate_goal_priority(self, goal: Goal, resource_type: str) -> float:
+        """Calculate priority for a goal based on its resource requirements."""
+        for req in goal.resource_requirements:
+            if req.resource_type == resource_type:
+                return req.priority
+        return 0.5  # Default priority
+    
+    def _calculate_dependency_priority(self, goal: Goal) -> float:
+        """Calculate dependency priority (prerequisite goals get higher priority)."""
+        if not goal.dependents:
+            return 1.0  # No dependents = high priority (can be completed)
+        
+        # Goals with more dependents get higher priority
+        dependent_count = len(goal.dependents)
+        return min(1.0, 0.5 + (dependent_count * 0.1)) 

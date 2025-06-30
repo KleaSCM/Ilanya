@@ -140,6 +140,8 @@ class Goal:
             self.created_at = datetime.now()
         if not self.updated_at:
             self.updated_at = datetime.now()
+        if self.last_reinforcement is None:
+            self.last_reinforcement = datetime.now()
     
     def update_progress(self, new_progress: float, confidence: Optional[float] = None):
         """Update goal progress and related properties."""
@@ -187,6 +189,12 @@ class Goal:
         if self.last_reinforcement is None:
             return False
         return (datetime.now() - self.last_reinforcement) < time_threshold
+    
+    def reinforce(self, reinforcement_strength: float = 1.0):
+        """Reinforce the goal to prevent pruning."""
+        self.last_reinforcement = datetime.now()
+        self.current_strength = min(1.0, self.current_strength + reinforcement_strength * 0.1)
+        self.updated_at = datetime.now()
     
     def should_be_pruned(self, pruning_threshold: timedelta) -> bool:
         """Check if goal should be pruned due to lack of reinforcement."""

@@ -17,6 +17,7 @@ from pathlib import Path
 import time
 import json
 from datetime import datetime, timedelta
+import re
 
 # Add project paths
 project_root = Path(__file__).parent.parent
@@ -36,7 +37,7 @@ def create_sample_desires():
             "id": "desire_001",
             "name": "Desire for Learning",
             "description": "I want to understand machine learning better",
-            "strength": 1.0,  # Maximum strength
+            "strength": 0.95,  # High strength - should form goal
             "confidence": 0.9,
             "source_traits": ["openness", "learning_rate"],
             "reinforcement_count": 5,
@@ -46,7 +47,7 @@ def create_sample_desires():
             "id": "desire_002", 
             "name": "Desire for Social Connection",
             "description": "I want to build meaningful relationships",
-            "strength": 0.95,  # High strength
+            "strength": 0.88,  # High strength - should form goal
             "confidence": 0.85,
             "source_traits": ["empathy", "openness"],
             "reinforcement_count": 3,
@@ -56,7 +57,7 @@ def create_sample_desires():
             "id": "desire_003",
             "name": "Desire for Creative Expression",
             "description": "I want to create something beautiful",
-            "strength": 0.8,  # Moderate strength
+            "strength": 0.75,  # Moderate strength - should NOT form goal
             "confidence": 0.7,
             "source_traits": ["creativity", "openness"],
             "reinforcement_count": 2,
@@ -66,7 +67,7 @@ def create_sample_desires():
             "id": "desire_004",
             "name": "Desire for Problem Solving",
             "description": "I want to solve complex challenges",
-            "strength": 0.6,  # Lower strength
+            "strength": 0.65,  # Lower strength - should NOT form goal
             "confidence": 0.6,
             "source_traits": ["adaptability", "learning_rate"],
             "reinforcement_count": 1,
@@ -76,7 +77,7 @@ def create_sample_desires():
             "id": "desire_005",
             "name": "Desire for Self-Improvement",
             "description": "I want to become a better version of myself",
-            "strength": 0.9,  # High strength
+            "strength": 0.87,  # High strength - should form goal
             "confidence": 0.8,
             "source_traits": ["self_awareness", "conscientiousness"],
             "reinforcement_count": 4,
@@ -142,19 +143,19 @@ def main():
     # Initialize Goals Engine with enhanced configuration
     print("\n1. 🔧 Initializing Enhanced Goals Engine...")
     config = GoalsEngineConfig(
-        max_strength_threshold=0.8,  # Lower threshold for demo
-        time_threshold=timedelta(seconds=30),  # Shorter for demo
-        formation_confidence_threshold=0.6,  # Lower threshold for demo
+        max_strength_threshold=0.85,  # Lowered from 0.9 to allow 2-3 goals
+        time_threshold=timedelta(seconds=45),  # Reduced from 1 minute for demo
+        formation_confidence_threshold=0.75,  # Lowered from 0.8 for demo
         trait_buff_multiplier=1.5,
         desire_buff_multiplier=1.3,
         completion_threshold=0.9,
-        pruning_threshold=timedelta(minutes=10),  # Shorter for demo
+        pruning_threshold=timedelta(hours=24),  # Increased to 24 hours to prevent pruning
         max_active_goals=5,
         nash_iteration_limit=50,  # Enhanced Nash equilibrium
         nash_convergence_threshold=1e-5,
         nash_learning_rate=0.02,
         field_attraction_strength=0.8,
-        objective_weights=[0.3, 0.25, 0.2, 0.15, 0.1]  # Pareto frontier weights
+        objective_weights=[0.3, 0.25, 0.2, 0.15, 0.1]  # Multi-objective optimization weights
     )
     
     goals_engine = GoalsEngine(config, logger)
@@ -173,7 +174,7 @@ def main():
     
     # Process desires multiple times to build temporal stability
     print("\n   🔄 Building Temporal Stability (Processing desires multiple times)...")
-    for i in range(5):  # Process 5 times to build history
+    for i in range(3):  # Reduced from 5 to 3 cycles to prevent excessive formation
         goals_engine.process_desires(desires)
         time.sleep(0.1)  # Small delay to simulate time passing
     
@@ -194,6 +195,11 @@ def main():
         print(f"        Source traits: {goal.source_traits}")
         print(f"        Trait buffs: {goal.trait_buffs}")
         print(f"        Desire buffs: {goal.desire_buffs}")
+    
+    # Reinforce goals immediately to prevent pruning
+    for goal in new_goals:
+        goal.reinforce()
+        print(f"   ✅ Reinforced goal: {goal.name}")
     
     # Step 2: Create goal dependencies and resource requirements
     print("\n3. 🔗 Creating Goal Dependencies and Resource Requirements...")
@@ -249,7 +255,7 @@ def main():
                         print(f"           ⚠️ Blocked by: {[b[:8] + '...' for b in blockers]}")
         
         # Display buffing results
-        buff_results = update_results['buffing']
+        buff_results = update_results['buffing_results']
         if buff_results['trait_buffs'] or buff_results['desire_buffs']:
             print(f"      💪 Buffing Results:")
             if buff_results['trait_buffs']:
@@ -259,14 +265,14 @@ def main():
             print(f"         • Total buff strength: {buff_results['total_buff_strength']:.3f}")
         
         # Display stability results
-        stability_results = update_results['stability']
+        stability_results = update_results['stability_results']
         if stability_results['nash_equilibrium_applied']:
             print(f"      ⚖️ Enhanced Nash Equilibrium Applied:")
             print(f"         • Conflicts resolved: {stability_results['conflicts_resolved']}")
             print(f"         • Lyapunov stability: {stability_results['lyapunov_stability']:.3f}")
         
         # Display resolution results
-        resolution_results = update_results['resolution']
+        resolution_results = update_results['resolution_results']
         if resolution_results['completed_goals']:
             print(f"      ✅ Completed Goals:")
             for goal in resolution_results['completed_goals']:
@@ -287,7 +293,7 @@ def main():
                 print(f"         • {goal.name}")
         
         # Display pruning results
-        pruning_results = update_results['pruning']
+        pruning_results = update_results['pruning_results']
         if pruning_results['pruned_count'] > 0:
             print(f"      🗑️ Pruned Goals: {pruning_results['pruned_count']}")
         
@@ -349,28 +355,34 @@ def main():
     
     # Step 6: Display resource conflict analysis
     print("\n7. 📊 Resource Conflict Analysis...")
-    
-    active_goals = list(goals_engine.active_goals.values())
-    for i, goal1 in enumerate(active_goals):
-        for j, goal2 in enumerate(active_goals[i+1:], i+1):
-            conflicts = goal1.get_resource_conflicts(goal2)
-            if conflicts:
-                print(f"   ⚠️ Resource conflicts between {goal1.name} and {goal2.name}:")
-                for conflict in conflicts:
-                    req1 = goal1.get_total_resource_requirement(conflict)
-                    req2 = goal2.get_total_resource_requirement(conflict)
-                    print(f"      • {conflict}: {req1:.2f} + {req2:.2f} = {req1 + req2:.2f} (exceeds 1.0)")
-    
-    # Step 7: Save state
-    print("\n8. 💾 Saving Goals Engine State...")
-    state = goals_engine.save_state()
-    
-    # Save to file
-    state_file = "goals_engine_state.json"
-    with open(state_file, 'w') as f:
-        json.dump(state, f, indent=2, default=str)
-    
-    print(f"   ✅ State saved to {state_file}")
+    if len(new_goals) >= 2:
+        goal1, goal2 = new_goals[0], new_goals[1]
+        conflicts = goal1.get_resource_conflicts(goal2)
+        
+        if conflicts:
+            print(f"   ⚠️ Resource conflicts between {goal1.name} and {goal2.name}:")
+            for conflict in conflicts:
+                req1 = goal1.get_total_resource_requirement(conflict)
+                req2 = goal2.get_total_resource_requirement(conflict)
+                total = req1 + req2
+                print(f"      • {conflict}: {req1:.2f} + {req2:.2f} = {total:.2f} (exceeds 1.0)")
+            
+            # Show resolution results from the latest update
+            if 'conflict_results' in update_results:
+                conflict_results = update_results['conflict_results']
+                if conflict_results['resolved_conflicts']:
+                    print("   ✅ Resource conflicts resolved:")
+                    for resolution in conflict_results['resolved_conflicts']:
+                        print(f"      • {resolution['resource_type']}: {resolution['original_usage']:.2f} → "
+                              f"Goal1: {resolution['resolution']['goal1_adjustment']:.2f}, "
+                              f"Goal2: {resolution['resolution']['goal2_adjustment']:.2f}")
+                    print(f"      • Resolution method: {resolution['resolution']['resolution_method']}")
+                else:
+                    print("   ℹ️ No resource conflicts detected")
+        else:
+            print("   ✅ No resource conflicts between goals")
+    else:
+        print("   ℹ️ Need at least 2 goals to analyze resource conflicts")
     
     # Step 8: Display mathematical insights
     print("\n9. 🧮 Enhanced Mathematical Insights...")
@@ -391,6 +403,38 @@ def main():
     print(f"      • Pareto frontier size: {formation_stats['pareto_frontier_size']}")
     print(f"      • Objective weights: {formation_stats['adaptive_thresholds']}")
     
+    # Step 7: Demonstrate goal monitoring and updates over time
+    print("\n8. 🔄 Goal Monitoring and Updates Over Time...")
+    
+    # Simulate goal updates over multiple cycles
+    for cycle in range(4):
+        print(f"\n   📊 Cycle {cycle + 1}/4:")
+        
+        # Update goals with time progression
+        time_delta = timedelta(seconds=5)  # Reduced from 30 seconds to 5 seconds per cycle
+        update_results = goals_engine.update_goals(time_delta)
+        
+        # Display current state
+        active_goals = list(goals_engine.active_goals.values())
+        print(f"      Active Goals: {len(active_goals)}")
+        
+        for goal in active_goals:
+            print(f"        • {goal.name}: {goal.progress:.3f} progress, {goal.current_strength:.3f} strength")
+        
+        # Display system metrics
+        buffing_results = update_results.get('buffing_results', {})
+        stability_results = update_results.get('stability_results', {})
+        
+        print(f"      System Entropy: {stability_results.get('system_entropy', 0):.3f}")
+        print(f"      Lyapunov Stability: {stability_results.get('lyapunov_stability', 0):.3f}")
+        print(f"      Total Buff Strength: {buffing_results.get('total_buff_strength', 0):.3f}")
+        
+        # Reinforce all active goals every cycle
+        for goal in active_goals:
+            goal.reinforce()
+        
+        time.sleep(0.1)  # Small delay to simulate time passing
+    
     print("\n🎉 Enhanced Goals Engine Demo Completed Successfully!")
     print("\nNew Features Demonstrated:")
     print("✅ Pareto frontier analysis for multi-objective optimization")
@@ -403,4 +447,22 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
+
+# Map of old keys to new keys
+key_map = {
+    'buffing': 'buffing_results',
+    'resolution': 'resolution_results',
+    'stability': 'stability_results',
+    'pruning': 'pruning_results',
+    'conflict': 'conflict_results',
+}
+
+with open('Demo/goals_engine_demo.py', 'r') as f:
+    code = f.read()
+
+for old, new in key_map.items():
+    code = re.sub(rf"update_results\['{old}'\]", f"update_results['{new}']", code)
+
+with open('Demo/goals_engine_demo.py', 'w') as f:
+    f.write(code) 

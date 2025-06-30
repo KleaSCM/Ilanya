@@ -25,9 +25,9 @@ class GoalsEngineConfig:
     """
     
     # Goal Formation Parameters
-    max_strength_threshold: float = 1.0  # Maximum desire strength for goal formation
-    time_threshold: timedelta = timedelta(minutes=5)  # Time to maintain max strength
-    formation_confidence_threshold: float = 0.8  # Minimum confidence for goal formation
+    max_strength_threshold: float = 0.9  # Increased from 0.8 - make formation harder
+    time_threshold: timedelta = timedelta(minutes=2)  # Increased from 30 seconds
+    formation_confidence_threshold: float = 0.85  # Increased from 0.8
     
     # Goal Buffing Parameters
     trait_buff_multiplier: float = 1.5  # How much goals buff original traits

@@ -197,6 +197,8 @@ class GoalFormationInterface:
             for j, point2 in enumerate(points):
                 if i != j:
                     if self._dominates(point1.objectives, point2.objectives):
+                        if point1.dominated_by is None:
+                            point1.dominated_by = []
                         point1.dominated_by.append(point2)
                         point2.domination_count += 1
         

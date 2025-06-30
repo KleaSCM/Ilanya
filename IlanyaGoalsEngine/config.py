@@ -12,7 +12,7 @@ Version: 0.1.0
 
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
 
 
 @dataclass
@@ -47,28 +47,39 @@ class GoalsEngineConfig:
     # Nash Equilibrium Parameters
     nash_iteration_limit: int = 100  # Maximum iterations for Nash equilibrium
     nash_convergence_threshold: float = 1e-6  # Convergence threshold for Nash
-    nash_learning_rate: float = 0.01  # Learning rate for Nash equilibrium
+    nash_learning_rate: float = 0.01  # Learning rate for Nash equilibrium updates
+    
+    # Field Attraction Parameters
+    field_attraction_strength: float = 0.8  # Strength of field-like attraction dynamics
+    
+    # Pareto Frontier Parameters
+    objective_weights: Optional[List[float]] = None  # Weights for multi-objective optimization
+    
+    # Resolution Parameters
+    resolution_confidence_threshold: float = 0.8  # Confidence threshold for goal resolution
+    user_feedback_weight: float = 0.3  # Weight given to user feedback in resolution
+    time_decay_factor: float = 0.1  # Factor for time-based decay in resolution
     
     # Multi-Objective Optimization Parameters
     moo_weight_decay: float = 0.95  # Weight decay for multi-objective optimization
     moo_pareto_threshold: float = 0.1  # Threshold for Pareto optimality
     moo_max_iterations: int = 50  # Maximum iterations for MOO
     
-    # Goal Resolution Parameters
-    resolution_confidence_threshold: float = 0.8  # Confidence needed for goal resolution
-    user_feedback_weight: float = 0.7  # Weight given to user feedback vs self-assessment
-    time_decay_factor: float = 0.05  # Factor for time-based goal decay
-    
     # Mathematical Stability Parameters
     system_entropy_threshold: float = 2.0  # Maximum allowed system entropy
     goal_interaction_decay: float = 0.2  # Decay rate for goal interactions
-    field_attraction_strength: float = 0.8  # Strength of field-like attraction
     
     # Logging and Debug Parameters
     log_level: str = "INFO"
     enable_debug_mode: bool = False
     save_goal_history: bool = True
     max_history_size: int = 1000
+    
+    def __post_init__(self):
+        """Initialize default values for complex parameters."""
+        if self.objective_weights is None:
+            # Default weights for: [strength, confidence, stability, field_attraction, resource_efficiency]
+            self.objective_weights = [0.3, 0.25, 0.2, 0.15, 0.1]
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert configuration to dictionary for serialization."""

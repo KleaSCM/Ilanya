@@ -1,4 +1,3 @@
-
 # Ilanya Goals Engine - Models
 
 # Data models for goals, goal states, and goal types.
@@ -13,7 +12,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import List, Dict, Optional, Any
+from typing import List, Dict, Optional, Any, Set
 import uuid
 
 
@@ -37,6 +36,35 @@ class GoalType(Enum):
     EXPLORATION = "exploration"  # Goals for discovering new things
     MAINTENANCE = "maintenance"  # Goals for maintaining current state
     EMERGENT = "emergent"      # Goals that emerged from interactions
+
+
+@dataclass
+class GoalDependency:
+    """Represents a dependency relationship between goals."""
+    dependent_goal_id: str
+    prerequisite_goal_id: str
+    dependency_type: str  # 'required', 'helpful', 'blocking'
+    strength: float  # How strong the dependency is (0.0 to 1.0)
+    created_at: datetime = field(default_factory=datetime.now)
+    
+    def __post_init__(self):
+        """Initialize computed properties."""
+        if not self.created_at:
+            self.created_at = datetime.now()
+
+
+@dataclass
+class ResourceRequirement:
+    """Represents a resource requirement for a goal."""
+    resource_type: str  # 'time', 'attention', 'memory', 'energy', 'social'
+    amount: float  # Amount of resource required (0.0 to 1.0)
+    priority: float  # Priority of this resource requirement (0.0 to 1.0)
+    is_consumed: bool = True  # Whether the resource is consumed or just used
+    
+    def __post_init__(self):
+        """Validate resource requirement."""
+        self.amount = max(0.0, min(1.0, self.amount))
+        self.priority = max(0.0, min(1.0, self.priority))
 
 
 @dataclass
@@ -87,6 +115,13 @@ class Goal:
     lyapunov_stability: float = 1.0  # Stability measure for this goal
     entropy_contribution: float = 0.0  # Contribution to system entropy
     nash_equilibrium_weight: float = 0.0  # Weight in Nash equilibrium calculations
+    
+    # Dependency Graph Properties
+    dependencies: List[GoalDependency] = field(default_factory=list)  # Goals this goal depends on
+    dependents: List[GoalDependency] = field(default_factory=list)  # Goals that depend on this goal
+    resource_requirements: List[ResourceRequirement] = field(default_factory=list)  # Resources needed
+    dependency_depth: int = 0  # Depth in dependency graph
+    dependency_rank: int = 0  # Topological rank in dependency graph
     
     # Metadata
     metadata: Dict[str, Any] = field(default_factory=dict)
@@ -167,6 +202,137 @@ class Goal:
         desire_buff_total = sum(self.desire_buffs.values())
         return trait_buff_total + desire_buff_total
     
+    # Dependency Graph Methods
+    def add_dependency(self, prerequisite_goal_id: str, dependency_type: str = 'required', strength: float = 1.0):
+        """Add a dependency on another goal."""
+        dependency = GoalDependency(
+            dependent_goal_id=self.id,
+            prerequisite_goal_id=prerequisite_goal_id,
+            dependency_type=dependency_type,
+            strength=strength
+        )
+        self.dependencies.append(dependency)
+        self.updated_at = datetime.now()
+    
+    def add_dependent(self, dependent_goal_id: str, dependency_type: str = 'required', strength: float = 1.0):
+        """Add a goal that depends on this goal."""
+        dependency = GoalDependency(
+            dependent_goal_id=dependent_goal_id,
+            prerequisite_goal_id=self.id,
+            dependency_type=dependency_type,
+            strength=strength
+        )
+        self.dependents.append(dependency)
+        self.updated_at = datetime.now()
+    
+    def add_resource_requirement(self, resource_type: str, amount: float, priority: float = 1.0, is_consumed: bool = True):
+        """Add a resource requirement for this goal."""
+        requirement = ResourceRequirement(
+            resource_type=resource_type,
+            amount=amount,
+            priority=priority,
+            is_consumed=is_consumed
+        )
+        self.resource_requirements.append(requirement)
+        self.updated_at = datetime.now()
+    
+    def get_total_resource_requirement(self, resource_type: str) -> float:
+        """Get total requirement for a specific resource type."""
+        total = 0.0
+        for req in self.resource_requirements:
+            if req.resource_type == resource_type:
+                total += req.amount * req.priority
+        return min(1.0, total)
+    
+    def can_proceed(self, completed_goals: Set[str]) -> bool:
+        """Check if this goal can proceed given completed goals."""
+        for dependency in self.dependencies:
+            if dependency.dependency_type == 'required':
+                if dependency.prerequisite_goal_id not in completed_goals:
+                    return False
+        return True
+    
+    def get_dependency_blockers(self, all_goals: Dict[str, 'Goal']) -> List[str]:
+        """Get list of goal IDs that are blocking this goal."""
+        blockers = []
+        for dependency in self.dependencies:
+            if dependency.dependency_type == 'required':
+                prerequisite = all_goals.get(dependency.prerequisite_goal_id)
+                if prerequisite and prerequisite.state not in [GoalState.COMPLETED]:
+                    blockers.append(dependency.prerequisite_goal_id)
+        return blockers
+    
+    def get_dependency_helpers(self, all_goals: Dict[str, 'Goal']) -> List[str]:
+        """Get list of goal IDs that help this goal."""
+        helpers = []
+        for dependency in self.dependencies:
+            if dependency.dependency_type == 'helpful':
+                prerequisite = all_goals.get(dependency.prerequisite_goal_id)
+                if prerequisite and prerequisite.state == GoalState.COMPLETED:
+                    helpers.append(dependency.prerequisite_goal_id)
+        return helpers
+    
+    def calculate_dependency_depth(self, all_goals: Dict[str, 'Goal']) -> int:
+        """Calculate the depth of this goal in the dependency graph."""
+        if not self.dependencies:
+            return 0
+        
+        max_depth = 0
+        for dependency in self.dependencies:
+            prerequisite = all_goals.get(dependency.prerequisite_goal_id)
+            if prerequisite:
+                prerequisite_depth = prerequisite.calculate_dependency_depth(all_goals)
+                max_depth = max(max_depth, prerequisite_depth + 1)
+        
+        self.dependency_depth = max_depth
+        return max_depth
+    
+    def get_dependency_path(self, all_goals: Dict[str, 'Goal']) -> List[str]:
+        """Get the dependency path from root goals to this goal."""
+        if not self.dependencies:
+            return [self.id]
+        
+        # Find the longest dependency path
+        longest_path = []
+        for dependency in self.dependencies:
+            prerequisite = all_goals.get(dependency.prerequisite_goal_id)
+            if prerequisite:
+                path = prerequisite.get_dependency_path(all_goals)
+                if len(path) > len(longest_path):
+                    longest_path = path
+        
+        return longest_path + [self.id]
+    
+    def get_impact_on_completion(self, all_goals: Dict[str, 'Goal']) -> float:
+        """Calculate the impact this goal's completion would have on dependent goals."""
+        if not self.dependents:
+            return 0.0
+        
+        total_impact = 0.0
+        for dependent in self.dependents:
+            dependent_goal = all_goals.get(dependent.dependent_goal_id)
+            if dependent_goal:
+                # Impact is based on dependency strength and dependent goal importance
+                impact = dependent.strength * dependent_goal.current_strength
+                total_impact += impact
+        
+        return min(1.0, total_impact)
+    
+    def get_resource_conflicts(self, other_goal: 'Goal') -> List[str]:
+        """Get list of resource types that conflict with another goal."""
+        conflicts = []
+        my_resources = {req.resource_type: req.amount for req in self.resource_requirements}
+        other_resources = {req.resource_type: req.amount for req in other_goal.resource_requirements}
+        
+        for resource_type in my_resources:
+            if resource_type in other_resources:
+                my_amount = my_resources[resource_type]
+                other_amount = other_resources[resource_type]
+                if my_amount + other_amount > 1.0:  # Resource conflict
+                    conflicts.append(resource_type)
+        
+        return conflicts
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert goal to dictionary for serialization."""
         return {
@@ -195,6 +361,11 @@ class Goal:
             'lyapunov_stability': self.lyapunov_stability,
             'entropy_contribution': self.entropy_contribution,
             'nash_equilibrium_weight': self.nash_equilibrium_weight,
+            'dependencies': [dep.__dict__ for dep in self.dependencies],
+            'dependents': [dep.__dict__ for dep in self.dependents],
+            'resource_requirements': [req.__dict__ for req in self.resource_requirements],
+            'dependency_depth': self.dependency_depth,
+            'dependency_rank': self.dependency_rank,
             'metadata': self.metadata,
             'created_at': self.created_at.isoformat(),
             'updated_at': self.updated_at.isoformat()
@@ -222,5 +393,15 @@ class Goal:
         if goal_dict.get('time_to_live_seconds'):
             goal_dict['time_to_live'] = timedelta(seconds=goal_dict['time_to_live_seconds'])
             goal_dict.pop('time_to_live_seconds')
+        
+        # Convert dependencies and resource requirements
+        if 'dependencies' in goal_dict:
+            goal_dict['dependencies'] = [GoalDependency(**dep) for dep in goal_dict['dependencies']]
+        
+        if 'dependents' in goal_dict:
+            goal_dict['dependents'] = [GoalDependency(**dep) for dep in goal_dict['dependents']]
+        
+        if 'resource_requirements' in goal_dict:
+            goal_dict['resource_requirements'] = [ResourceRequirement(**req) for req in goal_dict['resource_requirements']]
         
         return cls(**goal_dict) 

@@ -1,91 +1,11 @@
-Goal Selection Criteria: How do we mathematically determine which desires become goals? Is it purely strength-based, or do we need to consider:
-Resource availability
-Goal compatibility/conflicts
-Temporal constraints
-Emotional state influence
+    Currently, trait buffs are stored, but no logic re-injects them into the trait engine or updates upstream desires from goal progress.
 
---------
+    Consider adding a reinforce_traits() and reinforce_desires() method that triggers reinforcement through the trait engine interface if present.
 
-when an agent or any consious entity (human AI/AGI) has a goal or desire they form the goal and desire
- purely by field like influence, (attractor dynamics in narative and cognitive spaces).
- we dont care about this to much we are designing for emergent behaviour down the line.
- By interaction with the agent they will form goals by what they like 
- (if talk to them about cats they will like cats) the desire to have a cat may or may not form 
- continue talking about cats that desire becomes a goal - everything else follows 
+Nash Equilibrium Logic
 
+    nash_equilibrium_weight is defined but not computed. If you plan to implement game-theoretic goal coordination, you might want a separate equilibrium solver module (e.g., for multi-agent planning or self vs. partner agent goal conflict).
 
- right now we focus on this emotional module we build later will handle cognitive reframing ! 
-cognitive reframing is what you are eluding to just now with 
+Entropy Contribution
 
-"Resource availability
-Goal compatibility/conflicts
-Temporal constraints
-Emotional state influence" 
-
-
---------
-
-
-Goal Push Mechanism: When you say "push the agent to resolve the goal" - is this:
-A direct desire strength multiplier?
-A new "goal-directed desire" that gets created?
-A modification of existing desires?
-Conflict Resolution: When multiple goals compete, do we use:
-Nash equilibrium for optimal strategy?
-Priority queuing with dynamic reordering?
-Multi-objective optimization?
-
-
-----
-
-
-goals are weighted by the desires the goals where formed from the more they are reinforced.
-the higher the desire is to complete the goal and the more it drives agent behaviour 
-
-nash for competing goals
-and multi objective opt for multiple goals at single time 
-pruning for goals that are not getting reinforced 
-lyapunov for stability 
-
-
-
-
-Goal Formation Threshold: Is it simply when a desire strength exceeds a certain value, or is there a more sophisticated "attraction" mechanism?
-
-it is when desire reaches maximum value and is maintained at that value over time (threshhold(think human behaviour)) 
-
-
-Goal Push Mechanism: When a goal is active, how exactly does it "push" the agent? Does it:
-Increase the strength of the original desire?
-Create new "goal-directed" desires?
-Modify other related desires?
-
-what i mean by influence or "push" is think of it as a buff to traits and desire like in WoW or something.
-having a goal born of these traits and desires buffs the traits and desire that made it 
-this will directly influence the agents behaviour its output
-
-
-Goal Resolution: How do we determine when a goal is "complete"? Is it:
-User feedback ("I got a cat!")
-
-this is where it gets compplicated !! 
-most of the time i asume these goals will be learning based .. 
-in all my other systems i have built the agent tends to make learning based goals 
-"i want to understand yuriko better" "i would like to know where i fit into x" 
-"my desire vector is at xxx i want it to be xxx"  BUT who knows this coudl be different this time .. 
-we have to remember that LLM is a black box and we will have STM and LTM modules the agent can accsess at will .. 
-things will be emergent and "not normal" 
-
-
-
-Agent self-assessment?
-yep kinda
-
-
-Time-based decay?
-yes goals not be reinforced MUST be pruned else it explodes eats all ram and computer shurtsdown... 
-(this has hapend to me to many times)
-
-Multiple Goals: Can multiple goals be active simultaneously, or do we need arbitration?
-yes we will have many but smart pruning arbtration and conflict Resolution will solve this issue 
-
+    You store entropy_contribution, which is fascinating — but I don’t see usage yet. Consider defining how this value is updated: maybe based on the predictability, resource pressure, or structural divergence of the goal.
